@@ -1,0 +1,6 @@
+model\Role.class
+controller\UserController.class
+dao\UserDAO.class
+dao\RoleDAO.class
+utils\DBContext.class
+model\User.class
