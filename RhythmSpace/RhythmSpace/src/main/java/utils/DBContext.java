@@ -24,8 +24,8 @@ public class DBContext {
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
             String dbURL = "jdbc:sqlserver://localhost:1433;"
                     + "databaseName=RhythmManagement;"
-                    + "user=sa;"
-                    + "password=110606;"
+                    + "user=hekio;"
+                    + "password=100605;"
                     + "encrypt=true;trustServerCertificate=true;";
             conn = DriverManager.getConnection(dbURL);
             if (conn != null) {
@@ -36,13 +36,13 @@ public class DBContext {
                         + dm.getDatabaseProductName());
                 System.out.println("Product version: "
                         + dm.getDatabaseProductVersion());
-            }else{
+            } else {
                 System.out.println("NULL");
             }
         } catch (SQLException ex) {
-            System.out.println("Khong ket noi duoc roi em oi...........");
+            System.out.println("Chi tiết lỗi kết nối: " + ex.getMessage());
+            ex.printStackTrace(); // In ra luồng lỗi màu đỏ để dễ theo dõi
         } catch (ClassNotFoundException ex) {
-            Logger.getLogger(DBContext.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

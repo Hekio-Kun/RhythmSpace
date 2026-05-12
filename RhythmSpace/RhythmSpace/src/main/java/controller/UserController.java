@@ -22,8 +22,6 @@ import model.User;
 @WebServlet(name = "UserController", urlPatterns = {"/user"})
 public class UserController extends HttpServlet {
 
-    
-
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.
@@ -36,12 +34,21 @@ public class UserController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        String action = request.getParameter("action");
+        if (action == null) {
+            action = "all";
 
-      UserDAO userdao = new UserDAO();
-      List<User> list = userdao.getAllUser();
-      request.setAttribute("userList", list);
-      request.getRequestDispatcher("viewUser.jsp").forward(request, response);
-      
+        }
+        switch (action) {
+            case "all":
+                UserDAO userdao = new UserDAO();
+                List<User> list = userdao.getAllUser();
+                request.setAttribute("userList", list);
+                request.getRequestDispatcher("viewUser.jsp").forward(request, response);
+                break;
+
+        }
+
     }
 
     /**
@@ -55,7 +62,7 @@ public class UserController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-      
+
     }
 
     /**
