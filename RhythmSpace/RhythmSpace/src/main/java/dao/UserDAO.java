@@ -20,7 +20,7 @@ import model.User;
  */
 public class UserDAO extends DBContext {
 
-     public String hashMD5(String str) {
+    public String hashMD5(String str) {
         try {
             MessageDigest mes = MessageDigest.getInstance("MD5");
             byte[] messMD5 = mes.digest(str.getBytes());
@@ -38,7 +38,7 @@ public class UserDAO extends DBContext {
 
         return "";
     }
-    
+
     public List<User> getAllUser() {
         List<User> list = new ArrayList<>();
         String sql = "SELECT * FROM users";
@@ -63,16 +63,41 @@ public class UserDAO extends DBContext {
             System.out.println(e.getMessage());
         }
         return list;
-    
-       
-}
+
+    }
+
+    public User checkLogin(String username, String password) {
+        String sql = "SELECT * FROM users WHERE username = ? AND password = ?;";
+        try {
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, username);
+            ps.setString(2, hashMD5(password));
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                String email = rs.getString("email");
+                RoleDAO roleDao = new RoleDAO();
+                Role role = roleDao.getRoleById(rs.getInt("id"));
+                Timestamp createAt = rs.getTimestamp("created_at");
+
+                User user = new User(id, username, password, email, role, createAt);
+                return user;
+            }
+
+        } catch (Exception e) {
+            System.out.println("Fail to check login" + e.getMessage());
+        }
+        return null;
+    }
+
     public static void main(String[] args) {
-        
+
         UserDAO userDao = new UserDAO();
         List<User> list = userDao.getAllUser();
         for (User user : list) {
             System.out.println(user);
         }
-        
+
+        System.out.println(userDao.hashMD5("123"));
     }
 }
