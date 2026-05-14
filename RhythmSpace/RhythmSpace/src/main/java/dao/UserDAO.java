@@ -4,6 +4,7 @@
  */
 package dao;
 
+import java.security.MessageDigest;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
@@ -19,6 +20,25 @@ import model.User;
  */
 public class UserDAO extends DBContext {
 
+     public String hashMD5(String str) {
+        try {
+            MessageDigest mes = MessageDigest.getInstance("MD5");
+            byte[] messMD5 = mes.digest(str.getBytes());
+            //[0x0a, 0x7a, 0x12, 0x09]
+            StringBuilder result = new StringBuilder();
+            for (byte b : messMD5) {
+                //0x0a 0x7a; 0x12 0x09 0x3
+                String c = String.format("%02x", b);
+                //0a; 7a 12 09 03
+                result.append(c);
+            }
+            return result.toString();
+        } catch (Exception e) {
+        }
+
+        return "";
+    }
+    
     public List<User> getAllUser() {
         List<User> list = new ArrayList<>();
         String sql = "SELECT * FROM users";
