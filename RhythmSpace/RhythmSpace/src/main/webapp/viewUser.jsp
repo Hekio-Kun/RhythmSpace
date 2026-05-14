@@ -32,6 +32,7 @@
                 </tr>
             </c:forEach>
         </table>
+        <a href="logout" class="btn btn-danger">Đăng Xuất</a>
 
 
     </body>

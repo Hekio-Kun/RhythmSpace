@@ -1,75 +1,50 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
- */
 package controller;
 
 import dao.UserDAO;
+import model.User;
 import java.io.IOException;
-import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import model.User;
 
-/**
- *
- * @author Legion
- */
 @WebServlet(name = "LoginController", urlPatterns = {"/login"})
 public class LoginController extends HttpServlet {
 
-    /**
-     * Handles the HTTP <code>GET</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-       request.getRequestDispatcher("login.jsp").forward(request, response);
+        // Chuyển hướng người dùng tới trang login.jsp khi họ gõ URL /login
+        request.getRequestDispatcher("login.jsp").forward(request, response);
     }
 
-    /**
-     * Handles the HTTP <code>POST</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        UserDAO userDAO = new UserDAO();
         
         String username = request.getParameter("username");
         String password = request.getParameter("password");
         
+        UserDAO userDAO = new UserDAO();
         User user = userDAO.checkLogin(username, password);
-        if(user == null){
-            HttpSession session = request.getSession();
-            session.setAttribute("errorMsg", "Incorrect username or password!");
-        }
-        else{
-            response.sendRedirect("user");
+        
+        HttpSession session = request.getSession();
+        
+        if (user == null) {
+            // Đăng nhập THẤT BẠI
+            // Lưu câu thông báo lỗi vào session tạm thời
+            session.setAttribute("errorMsg", "Sai tài khoản hoặc mật khẩu!");
+            // Đẩy ngược lại về trang login
+            response.sendRedirect("login"); 
+        } else {
+            // Đăng nhập THÀNH CÔNG
+            // Cất toàn bộ đối tượng 'user' vào chiếc tủ Session mang tên "account"
+            session.setAttribute("account", user);
+            
+            // Chuyển hướng sang trang danh sách người dùng của bạn
+            response.sendRedirect("home");
         }
     }
-
-    /**
-     * Returns a short description of the servlet.
-     *
-     * @return a String containing servlet description
-     */
-    @Override
-    public String getServletInfo() {
-        return "Short description";
-    }// </editor-fold>
-
 }
