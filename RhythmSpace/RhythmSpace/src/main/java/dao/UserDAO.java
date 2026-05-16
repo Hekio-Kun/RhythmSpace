@@ -5,6 +5,7 @@
 package dao;
 
 import java.security.MessageDigest;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
@@ -90,6 +91,58 @@ public class UserDAO extends DBContext {
         return null;
     }
 
+    // Hàm 1: Kiểm tra xem username hoặc email đã bị người khác dùng chưa
+    public boolean checkUserExist(String username, String email) {
+        String sql = "SELECT * FROM users WHERE username = ? OR email = ?";
+        try {
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, username);
+            ps.setString(2, email);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return true; // Trả về true nghĩa là ĐÃ BỊ TRÙNG
+            }
+        } catch (Exception e) {
+            System.out.println("Lỗi checkUserExist: " + e.getMessage());
+        }
+        return false; // Chưa ai dùng, an toàn!
+    }
+
+    public boolean addNewUser(String username, String password, String email, int roleId, String Fullname, String phone, String address, boolean gender, Date dob) {
+        String sql = "INSERT INTO [dbo].[users] "
+                + "           ([username] "
+                + "           ,[password] "
+                + "           ,[email] "
+                + "           ,[role_id] "
+                + "           ,[FullName] "
+                + "           ,[Phone] "
+                + "           ,[Address] "
+                + "           ,[Gender] "
+                + "           ,[Dob]) "
+                + "     VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        try {
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, username);
+            ps.setString(2, password);
+            ps.setString(3, email);
+            ps.setInt(4, roleId);
+            ps.setString(5, Fullname);
+            ps.setString(6, phone);
+            ps.setString(7, address);
+            ps.setBoolean(8, gender);
+            ps.setDate(9, dob);
+            
+            int n = ps.executeUpdate();
+            if(n > 0){
+                return true;
+            }
+            
+        } catch (Exception e) {
+            System.out.println("Fail to add new user: " +e.getMessage());
+        }
+        return false;
+    }
+
     public static void main(String[] args) {
 
         UserDAO userDao = new UserDAO();
@@ -99,5 +152,21 @@ public class UserDAO extends DBContext {
         }
 
         System.out.println(userDao.hashMD5("123"));
+        
+        String username = "luke";
+        String password = userDao.hashMD5("123");
+        String email = "luke@gmail.com";
+        int roleId = 1;
+        String fullname = "Nguyen An Binh";
+        String phone = "012345678";
+        String address = "HCM";
+        boolean gender = true;
+        Date dob = Date.valueOf("2006-06-11");
+        
+        boolean addSuccess = userDao.addNewUser(username, password, email, roleId, fullname, phone, address, gender, dob);
+        if(addSuccess){
+            System.out.println("Add successfully!");
+        }
+        
     }
 }
